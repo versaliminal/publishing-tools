@@ -1,0 +1,7 @@
+witches:
+  gsheets_url: https://docs.google.com/spreadsheets/d/1p3lvpnybvFJbZe7YoiTzGG1eF_Fyn_NsbJDYbSHS4rU
+  inputs:
+    - sheet: Myths
+      template: myth.tex
+    - sheet: Witches
+      template: witch.tex
