@@ -2,8 +2,8 @@ witches:
   gsheets_url: https://docs.google.com/spreadsheets/d/1p3lvpnybvFJbZe7YoiTzGG1eF_Fyn_NsbJDYbSHS4rU
   inputs:
     - sheet: Myths
-      csv: myths.csv
+      table: myths.csv
       template: myth.tex
     - sheet: Witches
-      csv: witches.csv
+      table: witches.csv
       template: witch.tex

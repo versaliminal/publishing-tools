@@ -14,14 +14,16 @@ TABLE_PATH_FMT = '{project_dir}/tables/{table}'
 TEMPLATE_PATH_FMT = '{project_dir}/templates/{template}'
 RENDERED_PATH_FMT = '{project_dir}/rendered/{output}'
 INCLUDES_FILE = 'includes.tex'
+CONFIG_FILE_FMT = '{content_root}/projects.yaml'
 
 INCLUDE_FMT = '\\include{{rendered/{output}}}\n'
 
 YAML_TAG = '(yaml)'
 
-def read_conifg(filename, project):
-    print("Loading projects file: {0}".format(filename))
-    with open(filename, 'r') as file:
+def read_conifg(content_root, project):
+    config_file = CONFIG_FILE_FMT.format(content_root=content_root)
+    print("Loading projects file: {0}".format(config_file))
+    with open(config_file, 'r') as file:
         config = yaml.safe_load(file)
         if project in config:
             return config[project]
@@ -45,7 +47,7 @@ def refresh_sources(project_dir, config):
             print("\t- Error downloading file:", e)
 
 def clear_rendered(project_dir):
-    rendered_dir = RENDERED_PATH_FMT.format("")
+    rendered_dir = RENDERED_PATH_FMT.format(project_dir=project_dir, output="")
     if os.path.exists(rendered_dir):
         shutil.rmtree(rendered_dir)
     os.mkdir(rendered_dir)
@@ -73,7 +75,7 @@ def render_template(project_dir, table_name, template_name):
     with open(table_file_path, 'r', newline='') as table_file:
         reader = csv.DictReader(table_file)
 
-        template_dir = TEMPLATE_PATH_FMT.format(project_dir=project_dir, template=template_name)
+        template_dir = TEMPLATE_PATH_FMT.format(project_dir=project_dir, template="")
         env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
         env.globals.update(arg=jinja_to_latex_arg, args=jinja_to_latex_args)
         template = env.get_template(template_name)
@@ -103,9 +105,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print("Rendering: root={0}, project={1}".format(args.root, args.project))
     
-    content_root="{0}/content".format(args.root)
-    config_file = "{0}/projects.yaml".format(content_root)
-    config = read_conifg(config_file, args.project)
+    content_root="{0}/projects".format(args.root)
+    
+    config = read_conifg(content_root, args.project)
     project_dir = PROJECT_DIR_FMT.format(root=content_root, project=args.project)
 
     if args.refresh:
