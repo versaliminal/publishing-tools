@@ -12,8 +12,8 @@ To create a valid python environment run the follwoing:
 3. `pip install -r scripts/requirements.txt`
 
 # Creating a new project
-1. Create your templates under content/templates/{project-name}
-2. Create your source tables under content/tables/{project-name} (you may skip this if you want to refresh from gsheets)
+1. Create your templates under projects/{project_name}/templates/
+2. Create your source tables under projects/{project_name}/tables/ (you may skip this if you want to refresh from gsheets)
 3. Update the projects.yaml file to include your project resources
 
 # Rendering your project
