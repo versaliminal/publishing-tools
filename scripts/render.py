@@ -39,7 +39,7 @@ def refresh_sources(project_dir, config):
     if not config['gsheets_url']:
         print("No remote configured, skipping refresh")
         return
-    for entry in config['inputs']:
+    for entry in config['mappings']:
         url = GSHEETS_URL_FMT.format(url=config['gsheets_url'], sheet=entry['sheet'])
         output = TABLE_PATH_FMT.format(project_dir=project_dir, table=entry['table'])
         print("  * Downloading {0} sheet to {1}".format(entry['sheet'], output))
@@ -66,7 +66,7 @@ def jinja_to_latex_args(*args):
     return "".join(map(jinja_to_latex_arg, args))
 
 def render_templates(project_dir, config):
-    for entry in config['template_inputs']:
+    for entry in config['mappings']:
         render_template(project_dir, entry['table'], entry['template'])
 
 def render_template(project_dir, table_name, template_name):
@@ -120,13 +120,19 @@ if __name__ == '__main__':
     print("Rendering templates...")
     render_templates(project_dir, config)
 
-    print("Running LaTex...")
-    try:
-        os.mkdir(PDF_DIR_FMT.format(project_dir=project_dir))
-    except FileExistsError:
-        pass
-    args = ['pdflatex', '-interaction=nonstopmode', '-output-directory=pdf']
-    subprocess.run(args + config['latex_inputs'], cwd=project_dir)
+    outputs = config['outputs']
+    if outputs['latex']:
+        print("Running LaTex...")
+        try:
+            os.mkdir(PDF_DIR_FMT.format(project_dir=project_dir))
+        except FileExistsError:
+            pass
+        args = ['pdflatex', '-interaction=nonstopmode', '-output-directory=pdf']
+        result = subprocess.run(args + outputs['latex']['includes'], cwd=project_dir, capture_output=True, text=True)
+        if result.returncode != 0:
+            print("  ! Completed with status {0}, check logs".format(result.returncode))
+        else:
+            print('  * completed successfully')
 
     
 

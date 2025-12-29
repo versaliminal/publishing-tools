@@ -71,16 +71,26 @@ rows:
   - [Curved, Mournful Fisherman]
   - [Jagged, A king of Dwarves]
   - [Slender, A marauder]
-  - [Fractured, Beyond History]","title: Token Trades
+  - [Fractured, Beyond History]","title: Token Origins
+type: random
+format: XX
+headers:
+  - Creator
+  - Lost through
+rows:
+  - [Royal Artists, Willful loss]
+  - [Uncontrolled Magic, Invasion]
+  - [Strange Gnomes, Illusions]
+  - [Nature, Avarice]","title: Uncertain Past
 type: select
 format: XX
 headers:
-  - Example Trade
+  - Aspect
 rows:
-  - [Rare and Special Items]
-  - [Passage and guidance]
-  - [Short-term service]
-  - [Midlle authority]",""
+  - [Forbidden knowledge]
+  - [Unknown Orphan]
+  - [Memory lapses]
+  - [Represed incident]"
 "4","Mora","Sound, Movement, Timing","placeholder.jpg","Small Shield","A small shield of taut leather around scarred iron spikes","d6, A1, Hefty","Flying Ointment","Your spirit becomes unbound from your body and takes flight","Small Drum","Produces unearthly sounds when struck","Recurrance","whenever an action repeated across unrelated circumstances","Resonance","Non-attack actions repeated without interruption gain strength rapidly","","","title: Ointment Description
 type: random
 format: cXX

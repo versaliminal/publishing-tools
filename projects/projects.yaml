@@ -1,12 +1,14 @@
 mythic-witches:
   gsheets_url: https://docs.google.com/spreadsheets/d/1p3lvpnybvFJbZe7YoiTzGG1eF_Fyn_NsbJDYbSHS4rU
-  latex_inputs:
-    - mythic-witches.tex
-    - mythic-witches.cls
-  template_inputs:
+  mappings:
     - sheet: Myths
       table: myths.csv
       template: myth.tex
     - sheet: Witches
       table: witches.csv
       template: witch.tex
+  outputs:
+    latex:
+      includes:
+        - mythic-witches.tex
+        - mythic-witches.cls
