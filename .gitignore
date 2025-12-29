@@ -1,4 +1,5 @@
-content/images/
+projects/*/images/
+projects/*/rendered/
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
