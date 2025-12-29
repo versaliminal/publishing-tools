@@ -4,6 +4,7 @@ import csv
 import jinja2
 import os
 import shutil
+import subprocess
 import urllib.request
 import yaml
 
@@ -13,10 +14,11 @@ PROJECT_DIR_FMT = '{root}/{project}'
 TABLE_PATH_FMT = '{project_dir}/tables/{table}'
 TEMPLATE_PATH_FMT = '{project_dir}/templates/{template}'
 RENDERED_PATH_FMT = '{project_dir}/rendered/{output}'
+PDF_DIR_FMT = '{project_dir}/pdf'
 INCLUDES_FILE = 'includes.tex'
 CONFIG_FILE_FMT = '{content_root}/projects.yaml'
 
-INCLUDE_FMT = '\\include{{rendered/{output}}}\n'
+INCLUDE_FMT = '\\input{{rendered/{output}}} \clearpage\n'
 
 YAML_TAG = '(yaml)'
 
@@ -64,7 +66,7 @@ def jinja_to_latex_args(*args):
     return "".join(map(jinja_to_latex_arg, args))
 
 def render_templates(project_dir, config):
-    for entry in config['inputs']:
+    for entry in config['template_inputs']:
         render_template(project_dir, entry['table'], entry['template'])
 
 def render_template(project_dir, table_name, template_name):
@@ -117,6 +119,14 @@ if __name__ == '__main__':
     clear_rendered(project_dir)
     print("Rendering templates...")
     render_templates(project_dir, config)
+
+    print("Running LaTex...")
+    try:
+        os.mkdir(PDF_DIR_FMT.format(project_dir=project_dir))
+    except FileExistsError:
+        pass
+    args = ['pdflatex', '-interaction=nonstopmode', '-output-directory=pdf']
+    subprocess.run(args + config['latex_inputs'], cwd=project_dir)
 
     
 

@@ -1,4 +1,4 @@
-\ProvidesClass{witches}[witches doc format]
+\ProvidesClass{mythic-witches}[witches doc format]
 
 \LoadClass{extarticle}
 \RequirePackage{accsupp}

@@ -1,4 +1,6 @@
 projects/*/images/
+projects/*/img/
+projects/*/pdf/
 projects/*/rendered/
 .DS_Store
 
