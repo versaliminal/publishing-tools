@@ -1,5 +1,5 @@
-# ttrpg-tools
-Tools for managing and publishing content for Table-Top Roleplaying Games (TTRPGs)
+# publishing-tools
+Tools for managing and publishing content for Table-Top Roleplaying Games (TTRPGs), cookbooks, etc.
 
 The render.py script can take game content managed as CSVs, render those to LaTex templates, and then generate a PDF from those rendered templates and provided static content.
 
