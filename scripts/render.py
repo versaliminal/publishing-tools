@@ -91,7 +91,7 @@ def render_templates(project_dir, config, last_run):
     templates_dir = TEMPLATE_PATH_FMT.format(project_dir=project_dir, template="")
 
     mtime = max(max(os.path.getmtime(root) for root,_,_ in os.walk(tables_dir)),
-                max(os.path.getmtime(root) for root,_,_ in os.walk(tables_dir)))
+                max(os.path.getmtime(root) for root,_,_ in os.walk(templates_dir)))
     if last_run > mtime:
         print ("  ! No updates to tables or templates found, skipping templating: last-run={0}, last-update={1}"
                .format(time.ctime(last_run), time.ctime(mtime)))
@@ -116,6 +116,9 @@ def render_template(project_dir, table_file_path, template_dir, template_name):
         template = env.get_template(template_name)
 
         for row in reader:
+            if row['Render'] == 'FALSE':
+                continue
+
             output_file_name = "{0}-{1}.tex".format(row['Number'], row['Name'])
             output_file_path = RENDERED_PATH_FMT.format(project_dir=project_dir, output=output_file_name)
             
@@ -168,7 +171,6 @@ def update_last_run(project_dir):
     last_run_file = LASTRUN_FILE_FMT.format(project_dir=project_dir)
     with open(last_run_file, 'w') as lastrun:
         lastrun.truncate(0)    
-
 
 def main():
     """

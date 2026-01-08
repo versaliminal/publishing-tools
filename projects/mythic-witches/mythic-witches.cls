@@ -80,6 +80,13 @@
     ({\small\color{VLPurple}#1})
 }
 \setlist{leftmargin=*,labelsep=0.5em,nosep,itemsep=0.25\baselineskip,after=\vspace{0.25\baselineskip}}
+\newcommand{\pageBorder}{
+    \begin{tikzpicture}[remember picture,overlay]
+        \draw[line width=5pt, color=VLRed]
+            ($(current page.north west) + (10pt,-10pt)$) rectangle
+            ($(current page.south east) + (-10pt,10pt)$);
+    \end{tikzpicture}
+}
 
 % -----------------------------------------
 % Witches
