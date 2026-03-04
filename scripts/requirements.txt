@@ -1,3 +1,5 @@
 argparse
 jinja2
 pyyaml
+reportlab
+PyPDF2
