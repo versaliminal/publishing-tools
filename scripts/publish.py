@@ -32,13 +32,11 @@ def main():
     Implements main workflow.
     """
     parser = argparse.ArgumentParser(
-        description='A tool for refreshing CSV sources from google sheets')
+        description='A tool for rendering rich documents from CSV sources')
     parser.add_argument(
         '-r', '--root', help='Root content directory', default=os.getcwd())
     parser.add_argument('-u', '--refresh',
                         help='Refresh upstream sources', action='store_true')
-    parser.add_argument(
-        '-l', '--look', help='Open oututs with quicklook', action='store_true')
     args = parser.parse_args()
 
     config = read_conifg(args.root)
@@ -51,23 +49,30 @@ def main():
         utils.remote.refresh_sources(
             project_dir, pydash.get(config, 'inputs.remotes', {}))
 
-        print("Rendering templates...")
-        utils.render_templates(project_dir, pydash.get(
-            config, 'inputs.templates', []))
+    print("Rendering templates...")
+    utils.render_templates(project_dir, pydash.get(
+        config, 'inputs.templates', []))
 
-        outputs = config['outputs']
-        pdflatex = pydash.get(outputs, 'pdflatex')
-        if pdflatex:
-            print("Running LaTex to generate PDF...")
-            utils.latex.run_latex(project_dir, project, pdflatex, args.look)
+    results = []
+    outputs = config['outputs']
+    pdflatex = pydash.get(outputs, 'pdflatex')
+    if pdflatex:
+        print("Running LaTex to generate PDF...")
+        results.append(utils.latex.run_latex(project_dir, project, pdflatex))
 
-        print("Imposing PDFs...")
-        if pydash.get(config, 'outputs.impositor.halfpage'):
-            print("  * Creating half-page imposed version...")
-            utils.impose(project_dir, project, booklet=False)
-        if pydash.get(config, 'outputs.impositor.booklet'):
-            print("  * Creating booklet imposed version...")
-            utils.impose(project_dir, project, booklet=True)
+    print("Imposing PDFs...")
+    if pydash.get(config, 'outputs.impositor.halfpage'):
+        print("  * Creating half-page imposed version...")
+        results.append(utils.impose(project_dir, project, booklet=False))
+    if pydash.get(config, 'outputs.impositor.booklet'):
+        print("  * Creating booklet imposed version...")
+        results.append(utils.impose(project_dir, project, booklet=True))
+
+    if results:
+        print("\nOutputs:")
+        for result in results:
+            print("  - {0}".format(result))
+        print("")
 
 
 if __name__ == '__main__':
