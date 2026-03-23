@@ -3,3 +3,4 @@ jinja2
 pyyaml
 reportlab
 PyPDF2
+pydash
