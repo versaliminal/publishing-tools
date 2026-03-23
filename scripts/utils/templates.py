@@ -78,7 +78,8 @@ def render_template(project_dir, table_file_path, template_dir, template_name):
                     row['Name']))
                 continue
 
-            output_file_name = "{0}-{1}.tex".format(row['Number'], row['Name'])
+            output_file_name = "{0}-{1}.tex".format(
+                row['Number'], row.get('Name', '').replace(" ", "_"))
             output_file_path = RENDERED_PATH_FMT.format(
                 project_dir=project_dir, output=output_file_name)
 
