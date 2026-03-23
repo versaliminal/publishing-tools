@@ -55,18 +55,16 @@ def main():
 
     results = []
     outputs = config['outputs']
-    pdflatex = pydash.get(outputs, 'pdflatex')
-    if pdflatex:
+    pdflatex_config = pydash.get(config, 'outputs.pdflatex')
+    if pdflatex_config:
         print("Running LaTex to generate PDF...")
-        results.append(utils.latex.run_latex(project_dir, project, pdflatex))
+        results.append(utils.latex.run_latex(
+            project_dir, project, pdflatex_config))
 
-    print("Imposing PDFs...")
-    if pydash.get(config, 'outputs.impositor.halfpage'):
-        print("  * Creating half-page imposed version...")
-        results.append(utils.impose(project_dir, project, booklet=False))
-    if pydash.get(config, 'outputs.impositor.booklet'):
-        print("  * Creating booklet imposed version...")
-        results.append(utils.impose(project_dir, project, booklet=True))
+    imposer_config = pydash.get(config, 'outputs.imposer')
+    if imposer_config:
+        print("Imposing PDFs...")
+        results.extend(utils.imposer(project_dir, project, imposer_config))
 
     if results:
         print("\nOutputs:")

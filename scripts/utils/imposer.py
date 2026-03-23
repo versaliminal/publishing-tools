@@ -48,6 +48,20 @@ def get_standard_page_pairs(num_pages):
     return pairs
 
 
+def imposer(project_dir, project, config):
+    """
+    Imposes the base PDF according to the specified config (half-page or booklet).
+    """
+    results = []
+    if config.get('halfpage') == True:
+        print("  * Creating half-page imposed PDF")
+        results.append(impose(project_dir, project, booklet=False))
+    if config.get('booklet') == True:
+        print("  * Creating booklet imposed PDF")
+        results.append(impose(project_dir, project, booklet=True))
+    return results
+
+
 def impose(project_dir, project, booklet=False):
     """
     Creates half-page and booklet imposed versions of the base pdf.
