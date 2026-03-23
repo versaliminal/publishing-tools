@@ -1,6 +1,7 @@
 
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
+from . import format
 
 PDF_PATH_FMT = '{project_dir}/pdf/{project}.pdf'
 PDF_HP_PATH_FMT = '{project_dir}/pdf/{project}_halfpage.pdf'
@@ -54,10 +55,10 @@ def imposer(project_dir, project, config):
     """
     results = []
     if config.get('halfpage') == True:
-        print("  * Creating half-page imposed PDF")
+        format.print_subheader("Creating half-page imposed PDF")
         results.append(impose(project_dir, project, booklet=False))
     if config.get('booklet') == True:
-        print("  * Creating booklet imposed PDF")
+        format.print_subheader("Creating booklet imposed PDF")
         results.append(impose(project_dir, project, booklet=True))
     return results
 
@@ -108,4 +109,6 @@ def impose(project_dir, project, booklet=False):
     with open(dest, 'wb') as f:
         writer.write(f)
 
+    format.print_item_success(
+        "Generated imposed PDF", indent=1)
     return dest

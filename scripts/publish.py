@@ -14,16 +14,18 @@ def read_conifg(content_root):
     Reads the project config file.
     """
     config_file = CONFIG_FILE_FMT.format(content_root=content_root)
-    print("Loading projects file: {0}".format(config_file))
     with open(config_file, 'r') as file:
         config = yaml.safe_load(file)
-        errors = []
+        errors = False
         for key in ['project', 'inputs', 'outputs']:
             if key not in config:
-                errors.append(
-                    "Config file must contain '{0}' section".format(key))
+                utils.print_item_failure(
+                    "Config file must contain a valid '{0}' entry".format(key))
+                errors = True
         if errors:
-            raise ValueError("\n".join(errors))
+            return None
+        utils.print_item_success(
+            "Loaded configuration for project: {0}".format(config['project']))
         return config
 
 
@@ -39,36 +41,39 @@ def main():
                         help='Refresh upstream sources', action='store_true')
     args = parser.parse_args()
 
+    utils.print_header("Loading projects configuration...")
     config = read_conifg(args.root)
+    if not config:
+        utils.print_item_failure("Invalid project configuration")
+        return
     project = config['project']
     project_dir = PROJECT_DIR_FMT.format(root=args.root, project=project)
-    print("Rendering: root={0}, project={1}".format(args.root, project))
 
     if args.refresh:
-        print("Refreshing sources...")
+        utils.print_header("Refreshing sources...")
         utils.remote.refresh_sources(
             project_dir, pydash.get(config, 'inputs.remotes', {}))
 
-    print("Rendering templates...")
+    utils.print_header("Rendering templates...")
     utils.render_templates(project_dir, pydash.get(
         config, 'inputs.templates', []))
 
     results = []
     pdflatex_config = pydash.get(config, 'outputs.pdflatex')
     if pdflatex_config:
-        print("Running LaTex to generate PDF...")
+        utils.print_header("Running LaTex to generate PDF...")
         results.append(utils.latex.run_latex(
             project_dir, project, pdflatex_config))
 
     imposer_config = pydash.get(config, 'outputs.imposer')
     if imposer_config:
-        print("Imposing PDFs...")
+        utils.print_header("Imposing PDFs...")
         results.extend(utils.imposer(project_dir, project, imposer_config))
 
     if results:
-        print("\nOutputs:")
+        utils.print_header("Outputs:")
         for result in results:
-            print("  - {0}".format(result))
+            print("- {0}".format(result))
         print("")
 
 

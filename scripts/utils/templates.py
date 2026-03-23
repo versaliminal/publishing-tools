@@ -3,6 +3,7 @@ import jinja2
 import os
 import shutil
 import yaml
+from . import format
 
 TABLE_PATH_FMT = '{project_dir}/tables/{table}'
 TEMPLATE_PATH_FMT = '{project_dir}/templates/{template}'
@@ -73,7 +74,7 @@ def render_template(project_dir, table_file_path, template_dir, template_name):
 
         for row in reader:
             if row['Render'] == 'FALSE':
-                print("  ? Skipping {0} because Render is FALSE".format(
+                format.print_item_notice("Skipping {0} because Render is FALSE".format(
                     row['Name']))
                 continue
 
@@ -82,7 +83,7 @@ def render_template(project_dir, table_file_path, template_dir, template_name):
                 project_dir=project_dir, output=output_file_name)
 
             includes_file.write(INCLUDE_FMT.format(output=output_file_name))
-            print("  * Rendering {0}".format(output_file_name))
+            format.print_item_success("Rendering {0}".format(output_file_name))
             with open(output_file_path, 'w') as tex_file:
                 parsed_cols = {}
                 for k, v in row.items():
