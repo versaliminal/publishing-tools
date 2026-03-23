@@ -1,40 +1,17 @@
 import csv
-import time
 import jinja2
 import os
 import shutil
-import urllib.request
 import yaml
 
 TABLE_PATH_FMT = '{project_dir}/tables/{table}'
 TEMPLATE_PATH_FMT = '{project_dir}/templates/{template}'
 RENDERED_PATH_FMT = '{project_dir}/rendered/{output}'
 INCLUDES_FILE = 'includes.tex'
-GSHEETS_URL_FMT = '{url}/gviz/tq?tqx=out:csv&sheet={sheet}'
+
 INCLUDE_FMT = '\\input{{rendered/{output}}} \\clearpage\n'
 YAML_TAG = '(yaml)'
 
-def refresh_sources(project_dir, config):
-    """
-    Refreshes local tables from sheets in Google Sheets.
-    """
-    try:
-        os.mkdir(project_dir)
-        os.mkdir(TABLE_PATH_FMT.format(""))
-    except FileExistsError:
-        pass
-    gsheets_url = config.get('gsheets_url')
-    if not gsheets_url:
-        print("No remote configured, skipping refresh")
-        return
-    for entry in config['mappings']:
-        url = GSHEETS_URL_FMT.format(url=gsheets_url, sheet=entry['sheet'])
-        output = TABLE_PATH_FMT.format(project_dir=project_dir, table=entry['table'])
-        print("  * Downloading {0} sheet to {1}".format(entry['sheet'], output))
-        try:
-            urllib.request.urlretrieve(url, output)
-        except Exception as e:
-            print("\t- Error downloading file:", e)
 
 def clear_rendered(project_dir):
     """
@@ -44,6 +21,7 @@ def clear_rendered(project_dir):
     if os.path.exists(rendered_dir):
         shutil.rmtree(rendered_dir)
     os.mkdir(rendered_dir)
+
 
 def jinja_to_latex_arg(content):
     """
@@ -56,36 +34,35 @@ def jinja_to_latex_arg(content):
             return '{' + content + '}'
     return '{}'
 
+
 def jinja_to_latex_args(*args):
     """
     Formats any number of arguments as latex arguments.
     """
     return "".join(map(jinja_to_latex_arg, args))
 
-def render_templates(project_dir, config, last_run):
+
+def render_templates(project_dir, config):
     """
     Runs all table and template mappings.
     """
-    tables_dir = TABLE_PATH_FMT.format(project_dir=project_dir, table="")
-    templates_dir = TEMPLATE_PATH_FMT.format(project_dir=project_dir, template="")
-
-    mtime = max(max(os.path.getmtime(root) for root,_,_ in os.walk(tables_dir)),
-                max(os.path.getmtime(root) for root,_,_ in os.walk(templates_dir)))
-    if last_run > mtime:
-        print ("  ! No updates to tables or templates found, skipping templating: last-run={0}, last-update={1}"
-               .format(time.ctime(last_run), time.ctime(mtime)))
-        return
+    templates_dir = TEMPLATE_PATH_FMT.format(
+        project_dir=project_dir, template="")
 
     clear_rendered(project_dir)
-    for entry in config.get('templates', []):
-        table_file_path = TABLE_PATH_FMT.format(project_dir=project_dir, table=entry['table'])
-        render_template(project_dir, table_file_path, templates_dir, entry['template'])
+    for entry in config.get('mappings', []):
+        table_file_path = TABLE_PATH_FMT.format(
+            project_dir=project_dir, table=entry['table'])
+        render_template(project_dir, table_file_path,
+                        templates_dir, entry['template'])
+
 
 def render_template(project_dir, table_file_path, template_dir, template_name):
     """
     Runs the specified template for every row in the specified table.
     """
-    includes_file_path = RENDERED_PATH_FMT.format(project_dir=project_dir, output=INCLUDES_FILE)
+    includes_file_path = RENDERED_PATH_FMT.format(
+        project_dir=project_dir, output=INCLUDES_FILE)
     includes_file = open(includes_file_path, 'a')
     with open(table_file_path, 'r', newline='') as table_file:
         reader = csv.DictReader(table_file)
@@ -96,11 +73,14 @@ def render_template(project_dir, table_file_path, template_dir, template_name):
 
         for row in reader:
             if row['Render'] == 'FALSE':
+                print("  ? Skipping {0} because Render is FALSE".format(
+                    row['Name']))
                 continue
 
             output_file_name = "{0}-{1}.tex".format(row['Number'], row['Name'])
-            output_file_path = RENDERED_PATH_FMT.format(project_dir=project_dir, output=output_file_name)
-            
+            output_file_path = RENDERED_PATH_FMT.format(
+                project_dir=project_dir, output=output_file_name)
+
             includes_file.write(INCLUDE_FMT.format(output=output_file_name))
             print("  * Rendering {0}".format(output_file_name))
             with open(output_file_path, 'w') as tex_file:
