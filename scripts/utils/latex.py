@@ -4,6 +4,7 @@ import subprocess
 
 PDF_DIR_FMT = '{project_dir}/pdf'
 PDF_PATH_FMT = '{project_dir}/pdf/{project}.pdf'
+LOG_PATH_FMT = '{project_dir}/pdf/{project}.log'
 
 
 def run_latex(project_dir, project, config):
@@ -19,8 +20,8 @@ def run_latex(project_dir, project, config):
     result = subprocess.run(
         latex_args + config['includes'], cwd=project_dir, capture_output=True, text=True)
     if result.returncode != 0:
-        print("  ! Completed with status {0}, check logs".format(
-            result.returncode))
+        print("  ! Completed with status {0}, check logs: {1}".format(
+            result.returncode, LOG_PATH_FMT.format(project_dir=project_dir, project=project)))
     else:
         print('  * completed successfully')
 

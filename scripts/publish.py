@@ -54,7 +54,6 @@ def main():
         config, 'inputs.templates', []))
 
     results = []
-    outputs = config['outputs']
     pdflatex_config = pydash.get(config, 'outputs.pdflatex')
     if pdflatex_config:
         print("Running LaTex to generate PDF...")
