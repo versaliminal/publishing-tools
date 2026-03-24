@@ -1,5 +1,6 @@
 #!python
 import argparse
+import shutil
 import utils
 import os
 import pydash
@@ -8,6 +9,21 @@ import yaml
 
 PROJECT_DIR_FMT = '{root}/{project}'
 CONFIG_FILE_FMT = '{content_root}/project.yaml'
+
+PROJECT_STRUCTURE = [
+    '{project}',
+    '{project}/templates',
+    '{project}/tables',
+    '{project}/pdf',
+    '{project}/rendered',
+    '{project}/images',
+]
+PROJECT_EXAMPLES = [
+    'fancy.cls',
+    'printable.cls',
+    'common.cls',
+    'main.tex',
+]
 
 
 def read_conifg(content_root):
@@ -40,7 +56,28 @@ def main():
         '-r', '--root', help='Root content directory', default=os.getcwd())
     parser.add_argument('-u', '--update',
                         help='Update sources from remote', action='store_true')
+    parser.add_argument(
+        '-i', '--init', help='Initialize a new project with the provided name')
     args = parser.parse_args()
+
+    if args.init:
+        utils.print_header(
+            "Initializing new project: {0}...".format(args.init))
+        for path_fmt in PROJECT_STRUCTURE:
+            path = path_fmt.format(project=args.init)
+            os.makedirs(path, exist_ok=True)
+        utils.print_item_success("Created project structure")
+        src_path = Path(__file__).parent / 'skel'
+        dest = Path(args.init)
+        for example in PROJECT_EXAMPLES:
+            src = src_path / example
+            dest = Path(args.init) / example
+            shutil.copy(src, dest)
+        utils.print_item_success("Initialized project with example tex files")
+        utils.template_cp(src_path / 'project.yaml.template',
+                          Path(args.root) / 'project.yaml', args.init)
+        utils.print_item_success("Created example project.yaml file")
+        return
 
     utils.print_header("Loading projects configuration...")
     config = read_conifg(args.root)

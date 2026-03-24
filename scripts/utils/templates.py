@@ -51,20 +51,20 @@ def render_templates(project_dir, config):
         project_dir=project_dir, template="")
 
     clear_rendered(project_dir)
-    for entry in config.get('mappings', []):
-        table_file_path = TABLE_PATH_FMT.format(
-            project_dir=project_dir, table=entry['table'])
-        render_template(project_dir, table_file_path,
-                        templates_dir, entry['template'])
+    includes_file_path = RENDERED_PATH_FMT.format(
+        project_dir=project_dir, output=INCLUDES_FILE)
+    with open(includes_file_path, 'w') as includes_file:
+        for entry in config.get('mappings', []):
+            table_file_path = TABLE_PATH_FMT.format(
+                project_dir=project_dir, table=entry['table'])
+            render_template(project_dir, table_file_path,
+                            templates_dir, entry['template'], includes_file)
 
 
-def render_template(project_dir, table_file_path, template_dir, template_name):
+def render_template(project_dir, table_file_path, template_dir, template_name, includes_file):
     """
     Runs the specified template for every row in the specified table.
     """
-    includes_file_path = RENDERED_PATH_FMT.format(
-        project_dir=project_dir, output=INCLUDES_FILE)
-    includes_file = open(includes_file_path, 'a')
     with open(table_file_path, 'r', newline='') as table_file:
         reader = csv.DictReader(table_file)
 
@@ -94,4 +94,13 @@ def render_template(project_dir, table_file_path, template_dir, template_name):
                         name = k.replace(YAML_TAG, '').strip()
                         parsed_cols[name] = yaml.safe_load(v)
                 tex_file.write(template.render(raw=row, parsed=parsed_cols))
-        includes_file.close()
+
+
+def template_cp(src, dest, project):
+    """
+    Renders a single template file to the specified destination.
+    """
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(src.parent))
+    template = env.get_template(src.name)
+    with open(dest, 'w') as dest_file:
+        dest_file.write(template.render(project=project))

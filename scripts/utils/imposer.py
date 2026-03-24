@@ -1,4 +1,5 @@
 
+import os
 from pathlib import Path
 
 from pypdf import PdfReader, PdfWriter
@@ -54,6 +55,10 @@ def imposer(pdf_path, config):
     """
     Imposes the base PDF according to the specified config (half-page or booklet).
     """
+    if not os.path.exists(pdf_path):
+        format.print_item_failure("PDF file not found: {0}".format(pdf_path))
+        return []
+
     results = []
     if config.get('halfpage') == True:
         format.print_subheader("Creating half-page imposed PDF")

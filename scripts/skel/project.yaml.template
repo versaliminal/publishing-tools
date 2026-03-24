@@ -1,0 +1,23 @@
+project: {{project}}
+inputs:
+  remotes:
+    # Replace document_id with the id of your document or remove if not used
+    gsheets_url: https://docs.google.com/spreadsheets/d/<document_id>
+    mappings:
+      - sheet: <sheet>
+        table: <sheet>.csv
+  templates:
+    mappings:
+      - table: <sheet>.csv
+        template: <sheet-type>.tex
+outputs:
+  pdflatex:
+    mainfile: main.tex
+    variants:
+      - name: reference
+        class: fancy
+      - name: printable
+        class: printable
+  imposer:
+    halfpage: true
+    booklet: true
