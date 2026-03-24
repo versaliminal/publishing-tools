@@ -3,6 +3,7 @@ import argparse
 import utils
 import os
 import pydash
+from pathlib import Path
 import yaml
 
 PROJECT_DIR_FMT = '{root}/{project}'
@@ -37,8 +38,8 @@ def main():
         description='A tool for rendering rich documents from CSV sources')
     parser.add_argument(
         '-r', '--root', help='Root content directory', default=os.getcwd())
-    parser.add_argument('-u', '--refresh',
-                        help='Refresh upstream sources', action='store_true')
+    parser.add_argument('-u', '--update',
+                        help='Update sources from remote', action='store_true')
     args = parser.parse_args()
 
     utils.print_header("Loading projects configuration...")
@@ -49,7 +50,7 @@ def main():
     project = config['project']
     project_dir = PROJECT_DIR_FMT.format(root=args.root, project=project)
 
-    if args.refresh:
+    if args.update:
         utils.print_header("Refreshing sources...")
         utils.remote.refresh_sources(
             project_dir, pydash.get(config, 'inputs.remotes', {}))
@@ -58,17 +59,21 @@ def main():
     utils.render_templates(project_dir, pydash.get(
         config, 'inputs.templates', []))
 
-    results = []
+    pdfs = []
     pdflatex_config = pydash.get(config, 'outputs.pdflatex')
     if pdflatex_config:
         utils.print_header("Running LaTex to generate PDF...")
-        results.append(utils.latex.run_latex(
+        pdfs.extend(utils.latex.run_latex(
             project_dir, project, pdflatex_config))
+
+    results = []
+    results.extend(pdfs)
 
     imposer_config = pydash.get(config, 'outputs.imposer')
     if imposer_config:
-        utils.print_header("Imposing PDFs...")
-        results.extend(utils.imposer(project_dir, project, imposer_config))
+        for pdf in pdfs:
+            utils.print_header("Imposing PDF {0}...".format(Path(pdf).name))
+            results.extend(utils.imposer(pdf, imposer_config))
 
     if results:
         utils.print_header("Outputs:")

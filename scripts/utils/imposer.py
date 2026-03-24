@@ -1,11 +1,12 @@
 
+from pathlib import Path
+
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
 from . import format
 
-PDF_PATH_FMT = '{project_dir}/pdf/{project}.pdf'
-PDF_HP_PATH_FMT = '{project_dir}/pdf/{project}_halfpage.pdf'
-PDF_BOOKLET_PATH_FMT = '{project_dir}/pdf/{project}_booklet.pdf'
+PDF_HP_PATH_FMT = '{path}/{name}_halfpage.pdf'
+PDF_BOOKLET_PATH_FMT = '{path}/{name}_booklet.pdf'
 
 HP_WIDTH = letter[1] / 2
 HP_HEIGHT = letter[0]
@@ -49,32 +50,33 @@ def get_standard_page_pairs(num_pages):
     return pairs
 
 
-def imposer(project_dir, project, config):
+def imposer(pdf_path, config):
     """
     Imposes the base PDF according to the specified config (half-page or booklet).
     """
     results = []
     if config.get('halfpage') == True:
         format.print_subheader("Creating half-page imposed PDF")
-        results.append(impose(project_dir, project, booklet=False))
+        results.append(impose(pdf_path, booklet=False))
     if config.get('booklet') == True:
         format.print_subheader("Creating booklet imposed PDF")
-        results.append(impose(project_dir, project, booklet=True))
+        results.append(impose(pdf_path, booklet=True))
     return results
 
 
-def impose(project_dir, project, booklet=False):
+def impose(pdf_path, booklet=False):
     """
     Creates half-page and booklet imposed versions of the base pdf.
     """
-    reader = PdfReader(PDF_PATH_FMT.format(
-        project_dir=project_dir, project=project))
+    reader = PdfReader(pdf_path)
     writer = PdfWriter()
+    path = Path(pdf_path).parent
+    name = Path(pdf_path).stem
     if booklet:
         dest = PDF_BOOKLET_PATH_FMT.format(
-            project_dir=project_dir, project=project)
+            path=path, name=name)
     else:
-        dest = PDF_HP_PATH_FMT.format(project_dir=project_dir, project=project)
+        dest = PDF_HP_PATH_FMT.format(path=path, name=name)
 
     num_pages = len(reader.pages)
     if num_pages < 2:
