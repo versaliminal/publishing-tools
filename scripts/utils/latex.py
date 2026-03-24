@@ -26,6 +26,12 @@ def run_latex(project_dir, project, config):
     except FileExistsError:
         pass
 
+    if not config.get('variants'):
+        format.print_subheader("Running LaTex without variants")
+        results.append(run_latex_cmd(
+            project_dir, pdf_dir, config['mainfile']))
+        return results
+
     for variant in pydash.get(config, 'variants', []):
         format.print_subheader(
             "Running LaTex for variant: {0}".format(variant['name']))
