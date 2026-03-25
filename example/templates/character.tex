@@ -1,0 +1,17 @@
+\begin{center}
+{\huge\bfseries{Example Character Template}} \par
+\bigskip
+\bfseries{Name:} {{raw['Name'] }} \\
+\bfseries{Description:} {{raw['Blurb']}} \\
+
+\includegraphics[height=10em]{{ arg('images/characters/' + raw['Image']) }}
+
+{% set t = parsed['Table 1'] -%}
+\createTable{{ args(t['title'], t['format']) }}{
+{% for h in t['headers'] -%}\cvh{{ args(h) }}{% if loop.index != t['headers'] | length %} & {% endif %}{% endfor %} \tabularnewline
+{% for r in t['rows'] -%}
+{% for c in r %}{{ c }}{% if loop.index != r | length %} & {% endif %}{% endfor %} \tabularnewline
+{% endfor -%}
+}
+\end{center}
+\newpage

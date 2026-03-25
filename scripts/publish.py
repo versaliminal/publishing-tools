@@ -18,12 +18,6 @@ PROJECT_STRUCTURE = [
     '{project}/rendered',
     '{project}/images',
 ]
-PROJECT_EXAMPLES = [
-    'fancy.cls',
-    'printable.cls',
-    'common.cls',
-    'main.tex',
-]
 
 
 def read_conifg(content_root):
@@ -62,21 +56,11 @@ def main():
 
     if args.init:
         utils.print_header(
-            "Initializing new project: {0}...".format(args.init))
+            "Initializing new project directory structure: {0}...".format(args.init))
         for path_fmt in PROJECT_STRUCTURE:
             path = path_fmt.format(project=args.init)
             os.makedirs(path, exist_ok=True)
-        utils.print_item_success("Created project structure")
-        src_path = Path(__file__).parent / 'skel'
-        dest = Path(args.init)
-        for example in PROJECT_EXAMPLES:
-            src = src_path / example
-            dest = Path(args.init) / example
-            shutil.copy(src, dest)
-        utils.print_item_success("Initialized project with example tex files")
-        utils.template_cp(src_path / 'project.yaml.template',
-                          Path(args.root) / 'project.yaml', args.init)
-        utils.print_item_success("Created example project.yaml file")
+        utils.print_item_success("Created project directory structure")
         return
 
     utils.print_header("Loading projects configuration...")

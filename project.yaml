@@ -1,15 +1,15 @@
-project: {{project}}
+project: example
 inputs:
   remotes:
     # Replace document_id with the id of your document or remove if not used
-    gsheets_url: https://docs.google.com/spreadsheets/d/<document_id>
+    gsheets_url: https://docs.google.com/spreadsheets/d/1iSc-kmNEtHJ-jjAN8QFRgJaHpqIVTmjY-nkzHQqRKsQ
     mappings:
-      - sheet: <sheet>
-        table: <sheet>.csv
+      - sheet: Characters
+        table: characters.csv
   templates:
     mappings:
-      - table: <sheet>.csv
-        template: <sheet-type>.tex
+      - table: characters.csv
+        template: character.tex
 outputs:
   pdflatex:
     mainfile: main.tex
